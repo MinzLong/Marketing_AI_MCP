@@ -1,0 +1,17 @@
+# Node
+node_modules/
+dist/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Env
+.env
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
