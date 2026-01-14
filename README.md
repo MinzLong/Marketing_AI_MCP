@@ -35,6 +35,12 @@ Health check:
 Optional env:
 - Copy `backend/.env.example` to `backend/.env` and adjust origins if needed.
 
+## MCP Setup (Backend)
+
+Set the MCP server URLs and tokens in `backend/.env` (see `backend/.env.example`).
+
+For stdio MCP servers (like `npx 2slides-mcp`), set `MCP_*_STDIO_COMMAND`, `MCP_*_STDIO_ARGS`, and `MCP_*_STDIO_ENV` as JSON strings.
+
 ## Frontend
 
 ```powershell
