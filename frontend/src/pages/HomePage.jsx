@@ -1,21 +1,18 @@
-import Card from "../components/common/Card.jsx";
-import TextInput from "../components/forms/TextInput.jsx";
-import useHello from "../hooks/useHello.js";
+import DarkVeil from '../components/common/DarkVeil.jsx';
+import '../styles/DarkVeil.css';
 
 export default function HomePage() {
-  const { name, setName, message, status } = useHello();
 
   return (
-    <Card>
-      <div className="field">
-        <TextInput
-          label="Name"
-          value={name}
-          onChange={setName}
-          placeholder="Type your name"
-        />
-      </div>
-      <div className={`message ${status}`}>{message}</div>
-    </Card>
+    <div className='home-page-container'>
+      <DarkVeil
+        hueShift={0}
+        noiseIntensity={0}
+        scanlineIntensity={0}
+        speed={0.5}
+        scanlineFrequency={0}
+        warpAmount={0}
+      />
+    </div>
   );
 }

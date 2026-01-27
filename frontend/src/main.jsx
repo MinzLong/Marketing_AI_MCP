@@ -1,5 +1,5 @@
 import App from "./app/App.jsx";
-import "./styles/global.css";
+// import "./styles/global.css";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
