@@ -37,19 +37,14 @@ const PillNav = ({
                 const pill = circle.parentElement;
                 const rect = pill.getBoundingClientRect();
                 const { width: w, height: h } = rect;
-                const R = ((w * w) / 4 + h * h) / (2 * h);
-                const D = Math.ceil(2 * R) + 2;
-                const delta = Math.ceil(R - Math.sqrt(Math.max(0, R * R - (w * w) / 4))) + 1;
-                const originY = D - delta;
 
-                circle.style.width = `${D}px`;
-                circle.style.height = `${D}px`;
-                circle.style.bottom = `-${delta}px`;
+                // Set the hover circle to match the pill dimensions exactly
+                circle.style.width = '100%';
+                circle.style.height = '100%';
 
                 gsap.set(circle, {
-                    xPercent: -50,
-                    scale: 0,
-                    transformOrigin: `50% ${originY}px`
+                    opacity: 0,
+                    scale: 1
                 });
 
                 const label = pill.querySelector('.pill-label');
@@ -64,15 +59,16 @@ const PillNav = ({
                 tlRefs.current[index]?.kill();
                 const tl = gsap.timeline({ paused: true });
 
-                tl.to(circle, { scale: 1.2, xPercent: -50, duration: 2, ease, overwrite: 'auto' }, 0);
+                // Use opacity for the hover circle instead of scale
+                tl.to(circle, { opacity: 1, duration: 0.3, ease, overwrite: 'auto' }, 0);
 
                 if (label) {
-                    tl.to(label, { y: -(h + 8), duration: 2, ease, overwrite: 'auto' }, 0);
+                    tl.to(label, { y: -(h + 8), duration: 0.3, ease, overwrite: 'auto' }, 0);
                 }
 
                 if (white) {
                     gsap.set(white, { y: Math.ceil(h + 100), opacity: 0 });
-                    tl.to(white, { y: 0, opacity: 1, duration: 2, ease, overwrite: 'auto' }, 0);
+                    tl.to(white, { y: 0, opacity: 1, duration: 0.3, ease, overwrite: 'auto' }, 0);
                 }
 
                 tlRefs.current[index] = tl;
@@ -117,14 +113,12 @@ const PillNav = ({
         }
 
         return () => window.removeEventListener('resize', onResize);
-    }, [items, ease, initialLoadAnimation]);
-
-    const handleEnter = i => {
+    }, [items, ease, initialLoadAnimation]); const handleEnter = i => {
         const tl = tlRefs.current[i];
         if (!tl) return;
         activeTweenRefs.current[i]?.kill();
         activeTweenRefs.current[i] = tl.tweenTo(tl.duration(), {
-            duration: 0.3,
+            duration: 0.2,
             ease,
             overwrite: 'auto'
         });
@@ -135,7 +129,7 @@ const PillNav = ({
         if (!tl) return;
         activeTweenRefs.current[i]?.kill();
         activeTweenRefs.current[i] = tl.tweenTo(0, {
-            duration: 0.2,
+            duration: 0.15,
             ease,
             overwrite: 'auto'
         });
