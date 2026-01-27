@@ -4,6 +4,16 @@
     box-sizing: border-box;
 }
 
+.darkveil-canvas {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    z-index: -1;
+    pointer-events: none;
+}
+
 .home-page-container {
     width: 100vw;
     height: 100vh;

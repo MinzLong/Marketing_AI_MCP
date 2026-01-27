@@ -75,6 +75,7 @@ void main(){
 `;
 
 export default function DarkVeil({
+    children,
     hueShift = 0,
     noiseIntensity = 0,
     scanlineIntensity = 0,
@@ -136,12 +137,20 @@ export default function DarkVeil({
             frame = requestAnimationFrame(loop);
         };
 
-        loop();
-
-        return () => {
+        loop(); return () => {
             cancelAnimationFrame(frame);
             window.removeEventListener('resize', resize);
         };
     }, [hueShift, noiseIntensity, scanlineIntensity, speed, scanlineFrequency, warpAmount, resolutionScale]);
-    return <canvas ref={ref} className="darkveil-canvas" />;
+
+    return (
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+            <canvas
+                ref={ref}
+                className="darkveil-canvas"
+                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: -1 }}
+            />
+            {children}
+        </div>
+    );
 }
