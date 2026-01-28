@@ -8,6 +8,9 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LoginRegister />} />
+        <Route path="/about" element={<div>About Page</div>} />
+        <Route path="/services" element={<div>Services Page</div>} />
+        <Route path="/contact" element={<div>Contact Page</div>} />
       </Routes>
     </BrowserRouter>
   );
