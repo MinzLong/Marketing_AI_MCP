@@ -23,13 +23,13 @@ export default function LoginRegister() {
         username: '',
         email: '',
         password: ''
-    });
-
-    const handleRegisterClick = () => {
+    }); const handleRegisterClick = () => {
+        console.log('Register button clicked - switching to register form');
         setIsActive(true);
     };
 
     const handleLoginClick = () => {
+        console.log('Login button clicked - switching to login form');
         setIsActive(false);
     }; const handleLoginSubmit = async (e) => {
         e.preventDefault();

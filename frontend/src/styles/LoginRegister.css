@@ -120,13 +120,19 @@ body::before {
 }
 
 .form-box.register {
+    left: 0;
+    right: auto;
+    transform: translateX(-100%);
     visibility: hidden;
-    right: 50%;
+    transition: all 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .container.active .form-box.register {
     visibility: visible;
-    right: 0;
+    left: 0;
+    right: auto;
+    transform: translateX(0);
+    z-index: 2;
 }
 
 .input-box {
