@@ -1,8 +1,10 @@
 from flask import Blueprint
 
-from .health_routes import health_bp
-from .hello_routes import hello_bp
+from .users_routes import users_bp
+from .login import login_bp
+from .register import register_bp
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
-api_bp.register_blueprint(health_bp)
-api_bp.register_blueprint(hello_bp)
+api_bp.register_blueprint(users_bp)
+api_bp.register_blueprint(login_bp)
+api_bp.register_blueprint(register_bp)

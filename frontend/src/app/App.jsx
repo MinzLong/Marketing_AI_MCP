@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import HomePage from "../pages/HomePage.jsx";
 import LoginRegister from "../pages/LoginRegister.jsx";
 
 export default function App() {
@@ -12,3 +11,4 @@ export default function App() {
     </BrowserRouter>
   );
 }
+
