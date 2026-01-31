@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const request = axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
+    baseURL: import.meta.env.VITE_API_BASE_URL || '/api',  // Fallback to proxy
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json'
@@ -17,7 +17,7 @@ request.interceptors.request.use(
         }
 
         if (import.meta.env.VITE_ENABLE_LOGGING === 'true') {
-            console.log('API Request:', config);
+            // console.log('API Request:', config);
         }
 
         return config;
@@ -32,12 +32,12 @@ request.interceptors.request.use(
 request.interceptors.response.use(
     (response) => {
         if (import.meta.env.VITE_ENABLE_LOGGING === 'true') {
-            console.log('API Response:', response);
+            // console.log('API Response:', response);
         }
         return response;
     },
     (error) => {
-        console.error('API Error:', error.response?.status, error.response?.data || error.message);
+        // console.error('API Error:', error.response?.status, error.response?.data || error.message);
 
         if (error.response?.status === 401) {
             localStorage.removeItem('jwtToken');

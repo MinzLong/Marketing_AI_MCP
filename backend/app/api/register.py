@@ -37,23 +37,39 @@ def register():
         data = request.get_json()
         
         # Basic validation
-        if not data:            return jsonify({
+        if not data:            
+            return jsonify({
                 "success": False,
                 "error": "No data provided"
             }), 400
         
-        required_fields = ["name", "email", "password"]
-        for field in required_fields:
-            if not data.get(field):
-                return jsonify({
-                    "success": False,
-                    "error": f"{field.title()} is required"
-                }), 400
+        # Check for required fields - accept both 'name' and 'username'
+        name = data.get("name") or data.get("username")
+        email = data.get("email")
+        password = data.get("password")
         
-        name = data["name"].strip()
-        email = data["email"].lower().strip()
-        password = data["password"]
-        username = data.get("username", "").strip()  # Optional username field
+        if not name:
+            return jsonify({
+                "success": False,
+                "error": "Name or username is required"
+            }), 400
+            
+        if not email:
+            return jsonify({
+                "success": False,
+                "error": "Email is required"
+            }), 400
+            
+        if not password:
+            return jsonify({
+                "success": False,
+                "error": "Password is required"
+            }), 400
+        
+        name = name.strip()
+        email = email.lower().strip()
+        password = password
+        username = data.get("username", name).strip()  # Use name as fallback for username
         
         # Validate email format
         if not validate_email(email):
@@ -66,7 +82,8 @@ def register():
         is_valid, password_message = validate_password(password)
         if not is_valid:
             return jsonify({
-                "success": False,                "error": password_message
+                "success": False,
+                "error": password_message
             }), 400
         
         # Check if user already exists (by email or username)
@@ -78,12 +95,13 @@ def register():
             }), 409
             
         # Check username uniqueness if provided
-        if username:
+        if username and username != name:
             existing_username = DatabaseService.find_one("users", {"username": username})
             if existing_username:
                 return jsonify({
                     "success": False,
-                    "error": "Username is already taken"                }), 409
+                    "error": "Username is already taken"
+                }), 409
         
         # Hash password
         salt = bcrypt.gensalt()
@@ -100,8 +118,8 @@ def register():
             "is_active": True
         }
         
-        # Add username if provided
-        if username:
+        # Add username if provided and different from name
+        if username and username != name:
             user_data["username"] = username
         
         # Insert user

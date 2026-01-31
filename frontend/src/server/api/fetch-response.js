@@ -12,7 +12,7 @@ const fetchAPI = async (endpoint) => {
         if (error.code === "ECONNABORTED") {
             console.error("Request timed out");
         } else {
-            console.error("API error:", error.message);
+            // console.error("API error:", error.message);
         }
         return {
             error: error.message,
@@ -32,10 +32,14 @@ const fetchResponse = async (syncCallBackRequest) => {
         if (error.code === "ECONNABORTED") {
             console.error("Request timed out");
         } else {
-            console.error("API error:", error.message);
+            console.error("API error:", error.response?.status, error.response?.data || error.message);
         }
+
+        // Extract the actual error message from backend response
+        const backendError = error.response?.data?.error || error.message;
+
         return {
-            error: error.message,
+            error: backendError,
             status: false
         };
     }
