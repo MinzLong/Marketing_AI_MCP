@@ -9,6 +9,7 @@ import EmailIcon from '@mui/icons-material/Email';
 import { useState } from 'react';
 import useAuth from '../hooks/useAuth';
 import useRegistration from '../hooks/useRegistration';
+import GoogleAuthButton from '../components/auth/GoogleAuthButton';
 
 export default function LoginRegister() {
     const [isActive, setIsActive] = useState(false);
@@ -24,7 +25,22 @@ export default function LoginRegister() {
         username: '',
         email: '',
         password: ''
-    }); const mapBackendErrorToField = (errorMessage) => {
+    });
+
+    // Google Auth handlers
+    const handleGoogleAuthSuccess = (result) => {
+        console.log('Google authentication successful:', result);
+        // The token is already stored in localStorage by useGoogleAuth
+        // You can redirect or update UI state here
+        window.location.href = '/dashboard'; // or use navigate from react-router
+    };
+
+    const handleGoogleAuthError = (error) => {
+        console.error('Google authentication failed:', error);
+        setErrors({ general: error.message || 'Google authentication failed' });
+    };
+
+    const mapBackendErrorToField = (errorMessage) => {
         const errors = {};
         const message = errorMessage.toLowerCase();
 
@@ -80,7 +96,6 @@ export default function LoginRegister() {
             setErrors(newErrors);
             return;
         } try {
-            // console.log('Attempting login with:', { username: loginData.username, password: '[hidden]' });
 
             const result = await login(loginData.username, loginData.password);
 
@@ -130,11 +145,7 @@ export default function LoginRegister() {
 
         setRegisterLoading(true);
         try {
-            // console.log('Attempting registration with:', {
-            //     username: registerData.username,
-            //     email: registerData.email,
-            //     password: '[hidden]'
-            // });
+
 
             const result = await register(registerData.username, registerData.email, registerData.password); if (result && result.success) {
                 console.log('Registration successful!', result);
@@ -241,9 +252,11 @@ export default function LoginRegister() {
                     <p>Or login with social platforms</p>
                     <div className="social-icons">
                         <a href="#" onClick={(e) => e.preventDefault()}><FacebookIcon /></a>
-                        <a href="#" onClick={(e) => e.preventDefault()}><GoogleIcon /></a>
-                        <a href="#" onClick={(e) => e.preventDefault()}><LinkedInIcon /></a>
-                        <a href="#" onClick={(e) => e.preventDefault()}><XIcon /></a>
+                        <GoogleAuthButton
+                            type="signin"
+                            onSuccess={handleGoogleAuthSuccess}
+                            onError={handleGoogleAuthError}
+                        />
                     </div>
                 </form>
             </div>
@@ -313,15 +326,18 @@ export default function LoginRegister() {
                                 Requirements: 8+ chars, uppercase, lowercase, number
                             </div>
                         )}
-                    </div><button type="submit" className="btn" disabled={registerLoading}>
+                    </div>                    <button type="submit" className="btn" disabled={registerLoading}>
                         {registerLoading ? 'Creating Account...' : 'Create Account'}
                     </button>
                     <p>Or register with social platforms</p>
                     <div className="social-icons">
                         <a href="#" onClick={(e) => e.preventDefault()}><FacebookIcon /></a>
-                        <a href="#" onClick={(e) => e.preventDefault()}><GoogleIcon /></a>
-                        <a href="#" onClick={(e) => e.preventDefault()}><LinkedInIcon /></a>
-                        <a href="#" onClick={(e) => e.preventDefault()}><XIcon /></a>
+
+                        <GoogleAuthButton
+                            type="signup"
+                            onSuccess={handleGoogleAuthSuccess}
+                            onError={handleGoogleAuthError}
+                        />
                     </div>
                 </form>
             </div>

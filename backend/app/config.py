@@ -12,3 +12,11 @@ class Config:
     # MongoDB Configuration
     MONGODB_URI = os.getenv("MONGODB_URI")
     MONGODB_DATABASE = os.getenv("MONGODB_DATABASE", "marketing_ai_mcp")
+    
+    # JWT Configuration
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "your-secret-key")
+    
+    # Google OAuth Configuration
+    GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+    GOOGLE_REDIRECT_URI = os.getenv("GOOGLE_REDIRECT_URI", "http://localhost:5173/auth/google/callback")

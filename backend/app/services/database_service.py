@@ -28,6 +28,13 @@ class DatabaseService:
     def find_one(collection_name: str, filter_dict: dict = None):
         try:
             db = DatabaseService.get_db()
+            
+            # Convert string _id to ObjectId if present
+            if filter_dict and '_id' in filter_dict:
+                if isinstance(filter_dict['_id'], str):
+                    filter_dict = dict(filter_dict)  # Make a copy
+                    filter_dict['_id'] = ObjectId(filter_dict['_id'])
+            
             result = db[collection_name].find_one(filter_dict or {})
             if result and '_id' in result:
                 result['_id'] = str(result['_id'])
@@ -58,6 +65,13 @@ class DatabaseService:
     def update_one(collection_name: str, filter_dict: dict, update_dict: dict):
         try:
             db = DatabaseService.get_db()
+            
+            # Convert string _id to ObjectId if present
+            if filter_dict and '_id' in filter_dict:
+                if isinstance(filter_dict['_id'], str):
+                    filter_dict = dict(filter_dict)  # Make a copy
+                    filter_dict['_id'] = ObjectId(filter_dict['_id'])
+            
             result = db[collection_name].update_one(filter_dict, {"$set": update_dict})
             return result.modified_count
         except PyMongoError as e:
