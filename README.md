@@ -37,9 +37,40 @@ Optional env:
 
 ## MCP Setup (Backend)
 
-Set the MCP server URLs and tokens in `backend/.env` (see `backend/.env.example`).
+This backend is set up for the Google Forms MCP server (stdio-based).
 
-For stdio MCP servers (like `npx 2slides-mcp`), set `MCP_*_STDIO_COMMAND`, `MCP_*_STDIO_ARGS`, and `MCP_*_STDIO_ENV` as JSON strings.
+Set these in `backend/.env` (see `backend/.env.example`):
+- `MCP_GOOGLE_FORMS_STDIO_COMMAND`
+- `MCP_GOOGLE_FORMS_STDIO_ARGS`
+- `MCP_GOOGLE_FORMS_STDIO_ENV`
+- `MCP_GOOGLE_FORMS_STDIO_CWD`
+
+Example:
+```
+MCP_GOOGLE_FORMS_STDIO_COMMAND=node
+MCP_GOOGLE_FORMS_STDIO_ARGS=["./google-forms-mcp/build/index.js"]
+MCP_GOOGLE_FORMS_STDIO_ENV={"GOOGLE_CLIENT_ID":"...","GOOGLE_CLIENT_SECRET":"...","GOOGLE_REFRESH_TOKEN":"..."}
+MCP_GOOGLE_FORMS_STDIO_CWD=./google-forms-mcp
+```
+
+## GPT Form Generator (Backend)
+
+Set OpenAI credentials in `backend/.env`:
+```
+OPENAI_API_KEY=YOUR_KEY
+OPENAI_MODEL=gpt-4.1
+```
+
+Generate a form from a prompt (creates the form + adds questions):
+```
+POST http://localhost:8000/api/forms/generate
+{
+  "topic": "Customer satisfaction for a coffee shop",
+  "audience": "Walk-in customers",
+  "language": "Vietnamese",
+  "num_questions": 6
+}
+```
 
 ## Frontend
 
