@@ -2,16 +2,24 @@ import React from 'react';
 import GoogleIcon from '@mui/icons-material/Google';
 import useGoogleAuth from '../../hooks/useGoogleAuth';
 
-const GoogleAuthButton = ({ onSuccess, onError, disabled = false, type = 'signin' }) => {
-    const { signInWithGoogle, isLoading, error } = useGoogleAuth();
+const GoogleAuthButton = ({ onSuccess, onError, disabled = false, type = 'signin', isRegistration = false }) => {
+    const { registerWithGoogle, loginWithGoogle, isLoading, error } = useGoogleAuth();
 
     const handleGoogleAuth = async () => {
         try {
-            const result = await signInWithGoogle();
-            if (onSuccess) {
-                onSuccess(result);
+            // These functions redirect to Google OAuth, they don't return results
+            // The actual result handling happens in GoogleAuthCallback component
+            if (isRegistration) {
+                registerWithGoogle(); // No await needed - this redirects
+            } else {
+                loginWithGoogle(); // No await needed - this redirects
             }
+
+            // Don't call onSuccess here since we're redirecting to Google
+            // The success/error handling happens in the callback component
+
         } catch (err) {
+            console.error('Error initiating Google OAuth:', err);
             if (onError) {
                 onError(err);
             }

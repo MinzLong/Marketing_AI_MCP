@@ -1,5 +1,6 @@
 import os
 import requests
+from dotenv import load_dotenv
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from google.auth import exceptions
@@ -7,16 +8,18 @@ import jwt
 import datetime
 from .database_service import DatabaseService
 
+# Load environment variables at module import
+load_dotenv()
+
 class GoogleOAuthService:
-    """Service for handling Google OAuth authentication"""
     
     def __init__(self):
         self.client_id = os.getenv('GOOGLE_CLIENT_ID')
         self.client_secret = os.getenv('GOOGLE_CLIENT_SECRET')
         self.redirect_uri = os.getenv('GOOGLE_REDIRECT_URI', 'http://localhost:5173/auth/google/callback')
+        
     
     def get_google_auth_url(self):
-        """Generate Google OAuth authorization URL"""
         auth_url = (
             f"https://accounts.google.com/o/oauth2/v2/auth"
             f"?client_id={self.client_id}"
@@ -27,18 +30,19 @@ class GoogleOAuthService:
         )
         return auth_url
     
-    def exchange_code_for_token(self, code):
-        """Exchange authorization code for access token"""
+    def exchange_code_for_token(self, code, redirect_uri=None):
         try:
+            if redirect_uri is None:
+                redirect_uri = self.redirect_uri
+                
             token_url = "https://oauth2.googleapis.com/token"
             data = {
                 'client_id': self.client_id,
                 'client_secret': self.client_secret,
                 'code': code,
                 'grant_type': 'authorization_code',
-                'redirect_uri': self.redirect_uri,
+                'redirect_uri': redirect_uri,
             }
-            
             response = requests.post(token_url, data=data)
             token_data = response.json()
             
@@ -50,16 +54,15 @@ class GoogleOAuthService:
             raise Exception(f"Failed to exchange code for token: {str(e)}")
     
     def verify_google_token(self, id_token_str):
-        """Verify Google ID token and extract user info"""
         try:
-            # Verify the token
+            # Add clock skew tolerance of 300 seconds (5 minutes) to handle time sync issues
             idinfo = id_token.verify_oauth2_token(
                 id_token_str, 
                 google_requests.Request(), 
-                self.client_id
+                self.client_id,
+                clock_skew_in_seconds=300  # Allow 5 minutes clock skew
             )
             
-            # Check if token is from correct issuer
             if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
                 raise ValueError('Wrong issuer.')
             
@@ -76,59 +79,20 @@ class GoogleOAuthService:
         except Exception as e:
             raise Exception(f"Token verification failed: {str(e)}")
     
-    def get_or_create_user(self, google_user_info):
-        """Get existing user or create new user from Google info"""
+    def check_user_exists(self, email):
+        """Check if a user already exists with the given email"""
         try:
-            print(f"DEBUG: Google user info received: {google_user_info}")
-            
-            # Check if user exists by Google ID
-            user = DatabaseService.find_one("users", {"google_id": google_user_info['google_id']})
-            
-            if user:
-                print(f"DEBUG: Found existing user by Google ID: {user}")
-                # Update user info if exists and ensure username field exists
-                update_data = {
-                    "last_login": datetime.datetime.utcnow(),
-                    "name": google_user_info['name'],
-                    "picture": google_user_info.get('picture')
-                }
-                
-                # Ensure username field exists for older users
-                if "username" not in user:
-                    update_data["username"] = google_user_info['email'].split('@')[0]
-                
-                DatabaseService.update_one("users", {"_id": user["_id"]}, update_data)
-                
-                # Fetch updated user to ensure all fields are present
-                updated_user = DatabaseService.find_one("users", {"_id": user["_id"]})
-                return updated_user
-            
-            # Check if user exists by email
-            user = DatabaseService.find_one("users", {"email": google_user_info['email']})
-            
-            if user:
-                print(f"DEBUG: Found existing user by email: {user}")
-                # Link Google account to existing user
-                update_data = {
-                    "google_id": google_user_info['google_id'],
-                    "picture": google_user_info.get('picture'),
-                    "last_login": datetime.datetime.utcnow()
-                }
-                
-                # Ensure username field exists for older users
-                if "username" not in user:
-                    update_data["username"] = google_user_info['email'].split('@')[0]
-                
-                DatabaseService.update_one("users", {"_id": user["_id"]}, update_data)
-                
-                # Fetch updated user to ensure all fields are present
-                updated_user = DatabaseService.find_one("users", {"_id": user["_id"]})
-                return updated_user
-            
-            # Create new user
+            user = DatabaseService.find_one("users", {"email": email})
+            return user is not None
+        except Exception as e:
+            return False
+
+    def create_google_user(self, google_user_info):
+        """Create a new user from Google OAuth info"""
+        try:
             new_user = {
                 "google_id": google_user_info['google_id'],
-                "username": google_user_info['email'].split('@')[0],  # Use email prefix as username
+                "username": google_user_info['email'].split('@')[0],
                 "email": google_user_info['email'],
                 "name": google_user_info['name'],
                 "picture": google_user_info.get('picture'),
@@ -139,8 +103,7 @@ class GoogleOAuthService:
                 "last_login": datetime.datetime.utcnow()
             }
             
-            print(f"DEBUG: Creating new user: {new_user}")
-              # Make username unique if it already exists
+            # Ensure username uniqueness
             existing_user = DatabaseService.find_one("users", {"username": new_user["username"]})
             counter = 1
             original_username = new_user["username"]
@@ -149,26 +112,50 @@ class GoogleOAuthService:
                 existing_user = DatabaseService.find_one("users", {"username": new_user["username"]})
                 counter += 1
             
-            print(f"DEBUG: Final username after uniqueness check: {new_user['username']}")
-            
             user_id = DatabaseService.insert_one("users", new_user)
             new_user["_id"] = user_id
             
-            print(f"DEBUG: User created successfully with ID: {new_user['_id']}")
             return new_user
             
         except Exception as e:
-            print(f"DEBUG: Error in get_or_create_user: {str(e)}")
-            raise Exception(f"Failed to get or create user: {str(e)}")
-    
-    def generate_jwt_token(self, user):
-        """Generate JWT token for authenticated user"""
+            raise Exception(f"Failed to create user: {str(e)}")
+
+    def authenticate_google_user(self, google_user_info):
+        """Authenticate existing Google user and update login info"""
         try:
-            # Debug: Print user object to see what's missing
-            print(f"DEBUG: User object: {user}")
-            print(f"DEBUG: User keys: {list(user.keys()) if user else 'User is None'}")
+            # First try to find by google_id
+            user = DatabaseService.find_one("users", {"google_id": google_user_info['google_id']})
             
-            # Check if required fields exist
+            if not user:
+                # Then try to find by email
+                user = DatabaseService.find_one("users", {"email": google_user_info['email']})
+            
+            if not user:
+                return None
+            
+            # Update user info and last login
+            update_data = {
+                "last_login": datetime.datetime.utcnow(),
+                "name": google_user_info['name'],
+                "picture": google_user_info.get('picture')
+            }
+            
+            # If user didn't have google_id, add it
+            if "google_id" not in user or not user["google_id"]:
+                update_data["google_id"] = google_user_info['google_id']
+                update_data["auth_provider"] = "google"
+            
+            DatabaseService.update_one("users", {"_id": user["_id"]}, update_data)
+            
+            updated_user = DatabaseService.find_one("users", {"_id": user["_id"]})
+            return updated_user
+            
+        except Exception as e:
+            raise Exception(f"Failed to authenticate user: {str(e)}")
+
+    def generate_jwt_token(self, user):
+        try:
+            
             if not user:
                 raise Exception("User object is None")
             
@@ -178,11 +165,9 @@ class GoogleOAuthService:
             if "email" not in user:
                 raise Exception("User missing 'email' field")
                 
-            # Ensure username exists, use email prefix as fallback
             username = user.get("username")
             if not username:
                 username = user["email"].split('@')[0]
-                print(f"DEBUG: Username missing, using email prefix: {username}")
             
             payload = {
                 "user_id": str(user["_id"]),
@@ -197,5 +182,4 @@ class GoogleOAuthService:
             return token
             
         except Exception as e:
-            print(f"DEBUG: JWT generation error: {str(e)}")
             raise Exception(f"Failed to generate JWT token: {str(e)}")

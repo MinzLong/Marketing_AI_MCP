@@ -20,7 +20,6 @@ def create_app():
     })# Initialize MongoDB
     if app.config["MONGODB_URI"]:
         try:
-            # Configure MongoDB client for Atlas compatibility
             mongo_client = MongoClient(
                 app.config["MONGODB_URI"],
                 tls=True,
@@ -29,7 +28,6 @@ def create_app():
                 connectTimeoutMS=10000,
                 socketTimeoutMS=10000
             )
-            # Test the connection
             mongo_client.admin.command('ping')
             app.db = mongo_client[app.config["MONGODB_DATABASE"]]
             print(f"✅ Connected to MongoDB database: {app.config['MONGODB_DATABASE']}")

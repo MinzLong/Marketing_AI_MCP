@@ -85,7 +85,6 @@ def login():
 
 @login_bp.route("/verify-token", methods=["POST"])
 def verify_token():
-    """Verify JWT token endpoint"""
     try:
         auth_header = request.headers.get("Authorization")
         if not auth_header or not auth_header.startswith("Bearer "):
@@ -101,7 +100,6 @@ def verify_token():
             payload = jwt.decode(token, secret_key, algorithms=["HS256"])
             user_id = payload["user_id"]
             
-            # Get fresh user data
             user = DatabaseService.find_one("users", {"_id": ObjectId(user_id)})
             if not user:
                 return jsonify({
@@ -109,7 +107,6 @@ def verify_token():
                     "error": "User not found"
                 }), 401
             
-            # Remove password from user data
             user_data = {k: v for k, v in user.items() if k != "password"}
             
             return jsonify({

@@ -66,7 +66,6 @@ class DatabaseService:
         try:
             db = DatabaseService.get_db()
             
-            # Convert string _id to ObjectId if present
             if filter_dict and '_id' in filter_dict:
                 if isinstance(filter_dict['_id'], str):
                     filter_dict = dict(filter_dict)  # Make a copy
