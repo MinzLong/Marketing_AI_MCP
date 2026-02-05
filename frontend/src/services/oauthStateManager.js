@@ -28,20 +28,17 @@ class OAuthStateManager {
             age: timestamp ? Date.now() - parseInt(timestamp) : 'unknown'
         });
 
-        // Check if state exists and matches
         if (!storedState) {
             throw new Error('No stored OAuth state found');
         }
 
         if (storedState !== receivedState) {
-            // Try with URL decoding
             const decodedReceived = receivedState ? decodeURIComponent(receivedState) : null;
             if (storedState !== decodedReceived) {
                 throw new Error(`OAuth state mismatch. Expected: ${storedState}, Got: ${receivedState}`);
             }
         }
 
-        // Check if state is too old (5 minutes max)
         if (timestamp && (Date.now() - parseInt(timestamp) > 5 * 60 * 1000)) {
             throw new Error('OAuth state expired');
         }

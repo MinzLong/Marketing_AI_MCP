@@ -2,14 +2,18 @@ import '../styles/LoginRegister.css';
 import PersonIcon from '@mui/icons-material/Person';
 import LockIcon from '@mui/icons-material/Lock';
 import EmailIcon from '@mui/icons-material/Email';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import useAuth from '../hooks/useAuth';
 import useRegistration from '../hooks/useRegistration';
 import GoogleAuthButton from '../components/auth/GoogleAuthButton';
+import { showErrorToast } from '../components/common/toast-utils';
 
 export default function LoginRegister() {
     const [isActive, setIsActive] = useState(false);
     const [errors, setErrors] = useState({});
+    const hasShownToast = useRef(false);
 
     const { login, isLoading: authLoading, error: authError, isAuthenticated } = useAuth();
     const { register } = useRegistration();
@@ -18,12 +22,37 @@ export default function LoginRegister() {
         username: '',
         password: '',
         rememberMe: false
-    });
-    const [registerData, setRegisterData] = useState({
+    }); const [registerData, setRegisterData] = useState({
         username: '',
         email: '',
         password: ''
     });
+
+    // Check for OAuth error messages when component loads
+    useEffect(() => {
+        // Prevent duplicate toasts in StrictMode
+        if (hasShownToast.current) {
+            return;
+        }
+
+        // Check for error message from Google OAuth callback
+        const showErrorToasts = () => {
+            const errorMessage = sessionStorage.getItem('auth_error_message');
+            console.log('LoginRegister - Error message from sessionStorage:', errorMessage);
+
+            if (errorMessage) {
+                console.log('Showing error toast:', errorMessage);
+                showErrorToast(errorMessage);
+                sessionStorage.removeItem('auth_error_message'); // Clean up
+                hasShownToast.current = true; // Mark as shown
+            }
+        };
+
+        // Small delay to ensure everything is ready
+        const timer = setTimeout(showErrorToasts, 100);
+
+        return () => clearTimeout(timer);
+    }, []);
 
     const handleGoogleAuthSuccess = (result) => {
         if (!result) {
@@ -379,8 +408,21 @@ export default function LoginRegister() {
                     <button className="btn login-btn" onClick={handleLoginClick} type="button">
                         Login
                     </button>
-                </div>
-            </div>
+                </div>            </div>
+
+            {/* Toast Container for error notifications */}
+            <ToastContainer
+                position="top-right"
+                autoClose={2999}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+            />
         </div>
     );
 }

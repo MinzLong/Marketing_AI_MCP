@@ -1,11 +1,6 @@
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 const GOOGLE_REDIRECT_URI = import.meta.env.VITE_GOOGLE_REDIRECT_URI || 'http://localhost:5173/auth/google/callback';
 
-console.log('Google Auth Environment Variables:', {
-    GOOGLE_CLIENT_ID: GOOGLE_CLIENT_ID,
-    GOOGLE_REDIRECT_URI: GOOGLE_REDIRECT_URI,
-    isDefined: !!GOOGLE_CLIENT_ID
-});
 
 class GoogleAuthService {
     getGoogleAuthUrl(state, mode = 'login') {
@@ -14,12 +9,12 @@ class GoogleAuthService {
             throw new Error('Google OAuth is not properly configured. Please check environment variables.');
         }
 
-        console.log('Building Google Auth URL with:', {
-            client_id: GOOGLE_CLIENT_ID,
-            redirect_uri: GOOGLE_REDIRECT_URI,
-            state: state,
-            mode: mode
-        });
+        // console.log('Building Google Auth URL with:', {
+        //     client_id: GOOGLE_CLIENT_ID,
+        //     redirect_uri: GOOGLE_REDIRECT_URI,
+        //     state: state,
+        //     mode: mode
+        // });
 
         const params = new URLSearchParams({
             client_id: GOOGLE_CLIENT_ID,
@@ -39,7 +34,6 @@ class GoogleAuthService {
 
     async handleAuthCallback(code, mode = 'login') {
         try {
-            // Choose endpoint based on mode
             const endpoint = mode === 'register' ?
                 '/api/auth/google/register' :
                 '/api/auth/google/login';
@@ -87,7 +81,6 @@ class GoogleAuthService {
     }
 
     async signOut() {
-        // Clear stored tokens
         localStorage.removeItem('token');
         localStorage.removeItem('user');
         sessionStorage.removeItem('google_oauth_state');

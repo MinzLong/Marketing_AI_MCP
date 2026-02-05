@@ -1,6 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import useGoogleAuth from '../../hooks/useGoogleAuth';
+import CircularProgress from '@mui/material/CircularProgress';
+import Box from '@mui/material/Box';
+
+
+
+
 
 const GoogleAuthCallback = () => {
     const navigate = useNavigate();
@@ -36,51 +42,59 @@ const GoogleAuthCallback = () => {
                 error: error,
                 state: state,
                 allParams: Object.fromEntries(searchParams.entries())
-            });
-
-            if (error) {
+            }); if (error) {
                 setStatus('error');
                 setMessage(`Authentication failed: ${error}`);
-                setTimeout(() => navigate('/login'), 3000);
+                // Store error message for login page to show toast
+                sessionStorage.setItem('auth_error_message', `Authentication failed: ${error}`);
+                setTimeout(() => navigate('/login'), 2000);
                 return;
             }
 
             if (!code) {
                 setStatus('error');
                 setMessage('No authorization code received');
-                setTimeout(() => navigate('/login'), 3000);
+                // Store error message for login page to show toast
+                sessionStorage.setItem('auth_error_message', 'No authorization code received');
+                setTimeout(() => navigate('/login'), 2000);
                 return;
             }
 
-            // Mark as processed to prevent duplicate calls
             hasProcessed.current = true;
-            // Store the processed code to prevent reuse
+
             sessionStorage.setItem('processed_oauth_code', code);
 
-            // Get the stored mode (default to login if not found)
             const mode = sessionStorage.getItem('google_oauth_mode') || 'login';
 
-            // For now, we'll proceed without strict state validation to debug the issue
             // TODO: Re-enable proper state validation after debugging
-            console.log('⚠️ PROCEEDING WITHOUT STRICT STATE VALIDATION FOR DEBUGGING');            // Clear any stored OAuth data
+            console.log('⚠️ PROCEEDING WITHOUT STRICT STATE VALIDATION FOR DEBUGGING');
+            // Clear any stored OAuth data
             sessionStorage.removeItem('google_oauth_state');
-            sessionStorage.removeItem('google_oauth_mode');
-
-            try {
+            sessionStorage.removeItem('google_oauth_mode'); try {
                 setMessage(`Processing ${mode}...`);
                 const result = await handleGoogleCallback(code, mode); if (result && result.success) {
                     console.log('✅ OAuth Success:', result);
                     setStatus('success');
                     setMessage('Authentication successful! Redirecting...');
+
                     // Clean up processed code on success
                     sessionStorage.removeItem('processed_oauth_code');
-                    // Redirect to dashboard or home page after successful login
-                    setTimeout(() => navigate('/dashboard'), 2000);
+
+                    // Store success message for dashboard to show toast
+                    const successMsg = mode === 'register' ? 'Registration successful! Welcome' : 'Login successful! Welcome back';
+                    console.log('Storing success message in sessionStorage:', successMsg);
+                    sessionStorage.setItem('auth_success_message', successMsg);
+
+                    // Navigate to dashboard (toast will show there)
+                    setTimeout(() => navigate('/dashboard'), 1500);
                 } else {
                     console.error('❌ OAuth Failed - Invalid Result:', result);
                     setStatus('error');
                     setMessage(result?.error || 'Unexpected response from authentication');
-                    setTimeout(() => navigate('/login'), 3000);
+
+                    // Store error message for login page to show toast
+                    sessionStorage.setItem('auth_error_message', result?.error || 'Authentication failed. Please try again');
+                    setTimeout(() => navigate('/login'), 2000);
                 }
             } catch (err) {
                 console.error('💥 OAuth callback error:', err);
@@ -88,13 +102,16 @@ const GoogleAuthCallback = () => {
                 setStatus('error');
 
                 // Handle specific error cases
+                let errorMessage = 'Authentication failed. Please try again';
                 if (err.message.includes('invalid_grant')) {
-                    setMessage('Authentication session expired. Please try again.');
-                } else {
-                    setMessage(`Authentication failed: ${err.message}`);
-                }
+                    errorMessage = 'Authentication session expired. Please try again';
+                } else if (err.message) {
+                    errorMessage = err.message;
+                } setMessage(errorMessage);
 
-                setTimeout(() => navigate('/login'), 3000);
+                // Store error message for login page to show toast
+                sessionStorage.setItem('auth_error_message', errorMessage);
+                setTimeout(() => navigate('/login'), 2000);
             }
         };
 
@@ -107,96 +124,10 @@ const GoogleAuthCallback = () => {
             case 'error': return '#f44336';
             default: return '#2196f3';
         }
-    };
-
-    return (
-        <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            padding: '20px',
-            textAlign: 'center'
-        }}>
-            <div style={{
-                padding: '40px',
-                borderRadius: '8px',
-                backgroundColor: '#fff',
-                boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-                maxWidth: '400px',
-                width: '100%'
-            }}>
-                {status === 'processing' && (
-                    <div style={{
-                        width: '40px',
-                        height: '40px',
-                        border: '4px solid #f3f3f3',
-                        borderTop: '4px solid #2196f3',
-                        borderRadius: '50%',
-                        animation: 'spin 1s linear infinite',
-                        margin: '0 auto 20px'
-                    }} />
-                )}
-
-                {status === 'success' && (
-                    <div style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        backgroundColor: '#4caf50',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 20px',
-                        color: '#fff',
-                        fontSize: '20px'
-                    }}>
-                        ✓
-                    </div>
-                )}
-
-                {status === 'error' && (
-                    <div style={{
-                        width: '40px',
-                        height: '40px',
-                        borderRadius: '50%',
-                        backgroundColor: '#f44336',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 20px',
-                        color: '#fff',
-                        fontSize: '20px'
-                    }}>
-                        ✕
-                    </div>
-                )}
-
-                <h2 style={{
-                    color: getStatusColor(),
-                    marginBottom: '10px',
-                    fontSize: '18px'
-                }}>
-                    Google Authentication
-                </h2>
-
-                <p style={{
-                    color: '#666',
-                    margin: '0',
-                    fontSize: '14px'
-                }}>
-                    {message}
-                </p>
-            </div>
-
-            <style>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `}</style>
-        </div>
+    }; return (
+        <Box sx={{ display: 'flex' }}>
+            <CircularProgress />
+        </Box>
     );
 };
 
