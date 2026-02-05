@@ -7,16 +7,11 @@ const GoogleAuthButton = ({ onSuccess, onError, disabled = false, type = 'signin
 
     const handleGoogleAuth = async () => {
         try {
-            // These functions redirect to Google OAuth, they don't return results
-            // The actual result handling happens in GoogleAuthCallback component
             if (isRegistration) {
                 registerWithGoogle(); // No await needed - this redirects
             } else {
                 loginWithGoogle(); // No await needed - this redirects
             }
-
-            // Don't call onSuccess here since we're redirecting to Google
-            // The success/error handling happens in the callback component
 
         } catch (err) {
             console.error('Error initiating Google OAuth:', err);
