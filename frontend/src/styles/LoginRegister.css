@@ -1,12 +1,13 @@
 /* Modern Login/Register Page Styles */
-* {
+/* * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
-body {
+*/
+/* Scoped styles for login/register page only */
+.login-register-page {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     display: flex;
@@ -14,10 +15,12 @@ body {
     justify-content: center;
     overflow: hidden;
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 /* Animated background particles */
-body::before {
+/* body::before {
     content: '';
     position: absolute;
     width: 100%;
@@ -37,7 +40,7 @@ body::before {
     50% {
         transform: translateY(-20px) rotate(180deg);
     }
-}
+} */
 
 
 .container {

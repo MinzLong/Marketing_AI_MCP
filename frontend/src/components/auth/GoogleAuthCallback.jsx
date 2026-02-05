@@ -4,10 +4,6 @@ import useGoogleAuth from '../../hooks/useGoogleAuth';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 
-
-
-
-
 const GoogleAuthCallback = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -124,10 +120,71 @@ const GoogleAuthCallback = () => {
             case 'error': return '#f44336';
             default: return '#2196f3';
         }
-    }; return (
-        <Box sx={{ display: 'flex' }}>
-            <CircularProgress />
-        </Box>
+    };
+    return (
+        <div className="login-register-page">
+            <div className="container">
+                <div className="form-box login" style={{
+                    width: '100%',
+                    right: '0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    padding: '50px'
+                }}>
+                    <h1 style={{ marginBottom: '30px' }}>
+                        {status === 'processing' && 'Authenticating...'}
+                        {status === 'success' && 'Success!'}
+                        {status === 'error' && 'Authentication Failed'}
+                    </h1>
+
+                    <Box sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        gap: 3
+                    }}>
+                        {status === 'processing' && (
+                            <CircularProgress
+                                size={50}
+                                sx={{ color: getStatusColor() }}
+                            />
+                        )}
+
+                        {status === 'success' && (
+                            <div style={{
+                                fontSize: '48px',
+                                color: getStatusColor(),
+                                marginBottom: '10px'
+                            }}>
+                                ✓
+                            </div>
+                        )}
+
+                        {status === 'error' && (
+                            <div style={{
+                                fontSize: '48px',
+                                color: getStatusColor(),
+                                marginBottom: '10px'
+                            }}>
+                                ✗
+                            </div>
+                        )}
+
+                        <p style={{
+                            fontSize: '16px',
+                            color: '#6c7293',
+                            textAlign: 'center',
+                            maxWidth: '400px',
+                            lineHeight: '1.5'
+                        }}>
+                            {message}
+                        </p>
+                    </Box>
+                </div>
+            </div>
+        </div>
     );
 };
 

@@ -2,7 +2,7 @@ import DarkVeil from '../components/common/DarkVeil.jsx';
 import PillNav from '../components/common/PillNav.jsx';
 import '../styles/HomePage.css';
 import logo from '../assets/images/test.jpg';
-
+import { Link } from 'react-router-dom';
 
 
 export default function HomePage() {
@@ -14,8 +14,6 @@ export default function HomePage() {
         items={[
           { label: 'Home', href: '/' },
           { label: 'About', href: '/about' },
-          // { label: 'Services', href: '/services' },
-          // { label: 'Contact', href: '/contact' }
         ]}
         activeHref="/"
         className="custom-nav"
@@ -42,7 +40,7 @@ export default function HomePage() {
               <h1>From Zero to Persona: Automate your entire customer research loop with AI</h1>
               <p>Transform fragmented manual surveys into an intelligent research ecosystem. Our AI automatically generates optimized forms, distributes surveys, and creates detailed customer personas with deep behavioral insights—all in minutes, not weeks.</p>
               <div className="hero-buttons">
-                <button className="btn-primary">Start Free Trial</button>
+                <Link to="/login" style={{ textDecoration: 'none', color: 'inherit' }}><button className="btn-primary">Start Free Trial</button></Link>
                 <button className="btn-secondary">See Demo with Sample Data</button>
               </div>
             </div>

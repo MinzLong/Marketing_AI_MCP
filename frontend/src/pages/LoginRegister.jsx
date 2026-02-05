@@ -241,188 +241,193 @@ export default function LoginRegister() {
             ...prev,
             [name]: value
         }));
-    }; return (
-        <div className={`container ${isActive ? 'active' : ''}`}>
-            <div className="form-box login">
-                <form onSubmit={handleLoginSubmit}>
-                    <h1>Login</h1>
+    };
+    return (
+        <div className="login-register-page">
+            <div className={`container ${isActive ? 'active' : ''}`}>
+                <div className="form-box login">
+                    <form onSubmit={handleLoginSubmit}>
+                        <h1>Login</h1>
 
-                    {(errors.general || authError) && (
-                        <div className="error-message general-error" style={{
-                            color: errors.general?.includes('successful') ? '#27ae60' : '#e74c3c',
-                            textAlign: 'center',
-                            marginBottom: '15px',
-                            padding: '10px',
-                            backgroundColor: errors.general?.includes('successful') ? '#f0fff4' : '#fdf2f2',
-                            borderRadius: '4px',
-                            border: errors.general?.includes('successful') ? '1px solid #c3e6cb' : '1px solid #fecaca'
-                        }}>
-                            {errors.general || authError}
-                        </div>
-                    )}
-
-                    <div className="input-box">
-                        <input
-                            type="text"
-                            name="username"
-                            placeholder="Username or Email"
-                            value={loginData.username}
-                            onChange={handleLoginChange}
-                            className={errors.username ? 'error' : ''}
-                            required
-                        />
-                        <span className="icon"><PersonIcon /></span>
-                        {errors.username && <span className="error-message">{errors.username}</span>}
-                    </div>
-                    <div className="input-box">
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={loginData.password}
-                            onChange={handleLoginChange}
-                            className={errors.password ? 'error' : ''}
-                            required
-                        />
-                        <span className="icon"><LockIcon /></span>
-                        {errors.password && <span className="error-message">{errors.password}</span>}
-                    </div>
-                    <div className="remember-forgot">
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="rememberMe"
-                                checked={loginData.rememberMe}
-                                onChange={handleLoginChange}
-                            />
-                            Remember me
-                        </label>
-                        <a href="#" onClick={(e) => e.preventDefault()}>Forgot Password?</a>
-                    </div>
-                    <button type="submit" className="btn" disabled={authLoading}>
-                        {authLoading ? 'Signing In...' : 'Sign In'}
-                    </button>                    <p>Or login with social platforms</p>
-                    <div className="social-icons">
-                        <GoogleAuthButton
-                            type="signin"
-                            isRegistration={false}
-                            onSuccess={handleGoogleAuthSuccess}
-                            onError={handleGoogleAuthError}
-                        />
-                    </div>
-                </form>
-            </div>
-            <div className="form-box register">
-                <form onSubmit={handleRegisterSubmit}>
-                    <h1>Registration</h1>
-
-                    {errors.general && (
-                        <div className="error-message general-error" style={{
-                            color: '#e74c3c',
-                            textAlign: 'center',
-                            marginBottom: '15px',
-                            padding: '10px',
-                            backgroundColor: '#fdf2f2',
-                            borderRadius: '4px',
-                            border: '1px solid #fecaca'
-                        }}>
-                            {errors.general}
-                        </div>
-                    )}
-
-                    <div className="input-box">
-                        <input
-                            type="text"
-                            name="username"
-                            placeholder="Username"
-                            value={registerData.username}
-                            onChange={handleRegisterChange}
-                            className={errors.username ? 'error' : ''}
-                            required
-                        />
-                        <span className="icon"><PersonIcon /></span>
-                        {errors.username && <span className="error-message">{errors.username}</span>}
-                    </div>
-                    <div className="input-box">
-                        <input
-                            type="email"
-                            name="email"
-                            placeholder="Email Address"
-                            value={registerData.email}
-                            onChange={handleRegisterChange}
-                            className={errors.email ? 'error' : ''}
-                            required
-                        />
-                        <span className="icon"><EmailIcon /></span>
-                        {errors.email && <span className="error-message">{errors.email}</span>}
-                    </div>
-                    <div className="input-box">
-                        <input
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            value={registerData.password}
-                            onChange={handleRegisterChange}
-                            className={errors.password ? 'error' : ''}
-                            required
-                        />
-                        <span className="icon"><LockIcon /></span>
-                        {errors.password && <span className="error-message">{errors.password}</span>}
-                        {!errors.password && registerData.password && (
-                            <div className="password-requirements" style={{
-                                fontSize: '12px',
-                                color: '#666',
-                                marginTop: '5px',
-                                paddingLeft: '10px'
+                        {(errors.general || authError) && (
+                            <div className="error-message general-error" style={{
+                                color: errors.general?.includes('successful') ? '#27ae60' : '#e74c3c',
+                                textAlign: 'center',
+                                marginBottom: '15px',
+                                padding: '10px',
+                                backgroundColor: errors.general?.includes('successful') ? '#f0fff4' : '#fdf2f2',
+                                borderRadius: '4px',
+                                border: errors.general?.includes('successful') ? '1px solid #c3e6cb' : '1px solid #fecaca'
                             }}>
-                                Requirements: 8+ chars, uppercase, lowercase, number
+                                {errors.general || authError}
                             </div>
                         )}
-                    </div>
-                    <button type="submit" className="btn" disabled={registerLoading}>
-                        {registerLoading ? 'Creating Account...' : 'Create Account'}
-                    </button>                    <p>Or register with social platforms</p>
-                    <div className="social-icons">
 
-                        <GoogleAuthButton
-                            type="signup"
-                            isRegistration={true}
-                            onSuccess={handleGoogleAuthSuccess}
-                            onError={handleGoogleAuthError}
-                        />
+                        <div className="input-box">
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder="Username or Email"
+                                value={loginData.username}
+                                onChange={handleLoginChange}
+                                className={errors.username ? 'error' : ''}
+                                required
+                            />
+                            <span className="icon"><PersonIcon /></span>
+                            {errors.username && <span className="error-message">{errors.username}</span>}
+                        </div>
+                        <div className="input-box">
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                value={loginData.password}
+                                onChange={handleLoginChange}
+                                className={errors.password ? 'error' : ''}
+                                required
+                            />
+                            <span className="icon"><LockIcon /></span>
+                            {errors.password && <span className="error-message">{errors.password}</span>}
+                        </div>
+                        <div className="remember-forgot">
+                            <label>
+                                <input
+                                    type="checkbox"
+                                    name="rememberMe"
+                                    checked={loginData.rememberMe}
+                                    onChange={handleLoginChange}
+                                />
+                                Remember me
+                            </label>
+                            <a href="#" onClick={(e) => e.preventDefault()}>Forgot Password?</a>
+                        </div>
+                        <button type="submit" className="btn" disabled={authLoading}>
+                            {authLoading ? 'Signing In...' : 'Sign In'}
+                        </button>                    <p>Or login with social platforms</p>
+                        <div className="social-icons">
+                            <GoogleAuthButton
+                                type="signin"
+                                isRegistration={false}
+                                onSuccess={handleGoogleAuthSuccess}
+                                onError={handleGoogleAuthError}
+                            />
+                        </div>
+                    </form>
+                </div>
+                <div className="form-box register">
+                    <form onSubmit={handleRegisterSubmit}>
+                        <h1>Registration</h1>
+
+                        {errors.general && (
+                            <div className="error-message general-error" style={{
+                                color: '#e74c3c',
+                                textAlign: 'center',
+                                marginBottom: '15px',
+                                padding: '10px',
+                                backgroundColor: '#fdf2f2',
+                                borderRadius: '4px',
+                                border: '1px solid #fecaca'
+                            }}>
+                                {errors.general}
+                            </div>
+                        )}
+
+                        <div className="input-box">
+                            <input
+                                type="text"
+                                name="username"
+                                placeholder="Username"
+                                value={registerData.username}
+                                onChange={handleRegisterChange}
+                                className={errors.username ? 'error' : ''}
+                                required
+                            />
+                            <span className="icon"><PersonIcon /></span>
+                            {errors.username && <span className="error-message">{errors.username}</span>}
+                        </div>
+                        <div className="input-box">
+                            <input
+                                type="email"
+                                name="email"
+                                placeholder="Email Address"
+                                value={registerData.email}
+                                onChange={handleRegisterChange}
+                                className={errors.email ? 'error' : ''}
+                                required
+                            />
+                            <span className="icon"><EmailIcon /></span>
+                            {errors.email && <span className="error-message">{errors.email}</span>}
+                        </div>
+                        <div className="input-box">
+                            <input
+                                type="password"
+                                name="password"
+                                placeholder="Password"
+                                value={registerData.password}
+                                onChange={handleRegisterChange}
+                                className={errors.password ? 'error' : ''}
+                                required
+                            />
+                            <span className="icon"><LockIcon /></span>
+                            {errors.password && <span className="error-message">{errors.password}</span>}
+                            {!errors.password && registerData.password && (
+                                <div className="password-requirements" style={{
+                                    fontSize: '12px',
+                                    color: '#666',
+                                    marginTop: '5px',
+                                    paddingLeft: '10px'
+                                }}>
+                                    Requirements: 8+ chars, uppercase, lowercase, number
+                                </div>
+                            )}
+                        </div>
+                        <button type="submit" className="btn" disabled={registerLoading}>
+                            {registerLoading ? 'Creating Account...' : 'Create Account'}
+                        </button>
+                        <p>Or register with social platforms</p>
+                        <div className="social-icons">
+
+                            <GoogleAuthButton
+                                type="signup"
+                                isRegistration={true}
+                                onSuccess={handleGoogleAuthSuccess}
+                                onError={handleGoogleAuthError}
+                            />
+                        </div>
+                    </form>
+                </div>
+                <div className="toggle-box">
+                    <div className="toggle-panel toggle-left">
+                        <h1>Hello, Friend!</h1>
+                        <p>Don't have an account ?</p>
+                        <button className="btn register-btn" onClick={handleRegisterClick} type="button">
+                            Register
+                        </button>
                     </div>
-                </form>
-            </div>
-            <div className="toggle-box">
-                <div className="toggle-panel toggle-left">
-                    <h1>Hello, Friend!</h1>
-                    <p>Don't have an account ?</p>
-                    <button className="btn register-btn" onClick={handleRegisterClick} type="button">
-                        Register
-                    </button>
+
+                    <div className="toggle-panel toggle-right">
+                        <h1>Welcome Back!</h1>
+                        <p>Already have an account ?</p>
+                        <button className="btn login-btn" onClick={handleLoginClick} type="button">
+                            Login
+                        </button>
+                    </div>
                 </div>
 
-                <div className="toggle-panel toggle-right">
-                    <h1>Welcome Back!</h1>
-                    <p>Already have an account ?</p>
-                    <button className="btn login-btn" onClick={handleLoginClick} type="button">
-                        Login
-                    </button>
-                </div>            </div>
-
-            {/* Toast Container for error notifications */}
-            <ToastContainer
-                position="top-right"
-                autoClose={2999}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
+                {/* Toast Container for error notifications */}
+                <ToastContainer
+                    position="top-right"
+                    autoClose={2999}
+                    hideProgressBar={false}
+                    newestOnTop={false}
+                    closeOnClick
+                    rtl={false}
+                    pauseOnFocusLoss
+                    draggable
+                    pauseOnHover
+                    theme="light" />
+            </div>
         </div>
     );
+
 }
