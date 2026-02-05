@@ -12,6 +12,9 @@ export default function App() {
         <Route path="/login" element={<LoginRegister />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/auth/google/callback" element={<GoogleAuthCallback />} />
+        <Route path="/about" element={<div>About Page</div>} />
+        <Route path="/services" element={<div>Services Page</div>} />
+        <Route path="/contact" element={<div>Contact Page</div>} />
       </Routes>
     </BrowserRouter>
   );

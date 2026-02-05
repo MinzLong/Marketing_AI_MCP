@@ -6,6 +6,9 @@
 # Node
 node_modules/
 dist/
+google-forms-mcp/node_modules/
+google-forms-mcp/build/
+google-forms-mcp/.env
 
 # Python
 __pycache__/
